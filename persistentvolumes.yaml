@@ -7,10 +7,11 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
-  hostpath:
-    path: /mnt/data
+  gcepersistentDisk:
+    pdName: my-disk
+    fsType: ext4
 ---   
 
 #PersistentVolumeClaim: requests for storage 1gi in pv
@@ -20,7 +21,7 @@ metadata:
   name: my-pvc  
 spec:
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Gi
