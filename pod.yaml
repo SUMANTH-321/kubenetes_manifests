@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo_pod
+  labels:
+     app=demo
+spec:
+  containers:
+    -name: demo_pod
+    image: nginx:latest
+    resources:
+      cpu: "500M"
+      memory: "500Mi"
+    ports:
+      -containerPort: 80
+    volumeMounts: 
+      -name: config-volume
+      mountPath: /etc/config
+  volumes: 
+    -name: first_volume
+      
+
+    
