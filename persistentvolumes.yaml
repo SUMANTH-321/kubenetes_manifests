@@ -1,0 +1,44 @@
+#pods dont use persistent volumes directly, they use persistent volume claims
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec: 
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostpath:
+    path: /mnt/data
+---   
+
+#PersistentVolumeClaim: requests for storage 1gi in pv
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc  
+spec:
+  accessModes:
+    - ReadWriteOnce 
+  resources:
+    requests:
+      storage: 1Gi
+---
+
+#pod using the persistent volume claim
+apiVersion: v1  
+kind: Pod
+metadata:
+  name: my-pod    
+spec:
+  containers:
+    - name: my-container
+      image: nginx
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: my-volume 
+  volumes:
+    - name: my-volume 
+      persistentVolumeClaim:
+        claimName: my-pvc
