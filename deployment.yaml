@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:first-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app:my-app
+  strategy:
+    type: RollingUpdate
+    rollingupdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app:my-app
+    spec:
+      containers:
+        -name: pod_config
+        image: nginx:latest
+        ports:
+          -containerport: 80
+        resources:
+           cpu: "500M"
+           memory: "500Mi"
