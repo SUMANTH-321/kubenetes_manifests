@@ -1,0 +1,49 @@
+#there are 4 types of services available 
+#CLUSTERIP
+#this is for interal communication among the services
+apiVersion: v1 
+kind: Service
+metadata: 
+  name: first-svc
+spec:
+  type: ClusterIP #Route the traffic to pods with label my-app
+  selector:
+    app: my-app
+  ports:
+    -port: 80
+    TargetPort: 80
+  
+
+
+
+#2) NODEPORT - Exposes the application throug nodeport 
+
+apiversion: v1
+kind: Service
+metadata:
+  name: second_svc
+spec:
+  type: nodeport
+  selector:
+    app: my-app
+  ports:
+    -port: 80
+    targetPort: 80
+    NodePort: 30007
+
+
+#3) LOAD BALANCER -CLOUD PROVIDER PROVIDES THE EXTERNAL LOAD BALANCER 
+
+apiVersion: v1
+kind: service
+metadata: 
+  name: third-svc
+spec:
+  type: LoadBlanacer
+  selector:
+    app: my-app
+  ports:
+    port: 80
+    TargetPort: 80
+
+
