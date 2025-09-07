@@ -1,0 +1,68 @@
+1)Pod Pending Issue -->You deployed a pod, but it’s stuck in Pending state? How would you troubleshoot and fix this?
+ans)
+A pod in Pending usually means it’s not scheduled yet. I’ll start with kubectl describe pod to check events.
+If it’s resource-related, I’ll check node capacity and adjust requests or scale nodes. 
+If it’s PVC-related, I’ll ensure the PVC is bound. 
+I’ll also check for node taints, nodeSelectors, or affinity rules that might block scheduling.
+
+2)CrashLoopBackOff --->A pod keeps restarting with status CrashLoopBackOff? What steps do you take to find the root cause?
+ans)
+“If a pod is in CrashLoopBackOff, I first check kubectl logs --previous to see why the container is crashing. Then I check kubectl describe pod for probe failures or OOM kills.
+Common fixes include correcting misconfigured probes, ensuring configs/secrets are mounted, fixing bad startup commands, or adjusting resource limits.”
+common causes:
+App crash → Fix code/config causing exit.
+Probes failing → Adjust probe path/port, increase initialDelaySeconds.
+Wrong command → Correct command/args in YAML.
+Config missing → Mount ConfigMaps/Secrets properly.
+OOMKilled → Increase memory request/limit or optimize app.
+
+3)Image Pull Error--->Pod is stuck with ImagePullBackOff? How do you fix private image registry authentication issues?
+ans)
+When a pod is in ImagePullBackOff, it means Kubernetes cannot pull the container image.
+I’ll check the pod events with kubectl describe pod to see if it’s due to a wrong image name, missing tag, or authentication error. 
+If it’s a private registry, I’ll configure imagePullSecrets. 
+I’ll also verify if the image exists in the registry and that the nodes can reach the registry
+->Image name/tag incorrect
+Example: typo in my-app:v11 instead of my-app:v1.
+->Image doesn’t exist in registry
+Artifact not pushed, or wrong repository.
+->Private registry authentication missing
+No imagePullSecrets configured.
+->Network/DNS issue
+Node can’t reach Docker Hub or private registry.
+ 
+4)Node Not Ready--> if the node is in Not Ready state? How will yoou troubleshoot it ?
+
+If a node shows NotReady, I first run kubectl describe node to check the condition.
+Common reasons are DiskPressure, MemoryPressure, network plugin issues, or kubelet not responding. 
+If it’s a resource issue, I free up disk or increase node size. If kubelet has crashed, I restart it. 
+In GKE, sometimes it’s due to node certificates or underlying VM issues, so draining and recreating the node fixes it. 
+I always check events and kubelet logs to identify the root cause.
+
+DiskPressure → Free up space or increase disk size.
+MemoryPressure → Adjust pod resource requests or upgrade node size.
+Network issues → Restart CNI plugin pods (Cilium, Calico, etc.)
+Kubelet crash → Restart kubelet:
+
+5)Service Not Accessible--> You created a service for your app, but it’s not accessible from within the cluster? What would you check first?
+ans)
+If a service isn’t accessible within the cluster, the first thing I check is whether the service selector matches the pod labels, because that’s the most common mistake. 
+Then I check if the service has endpoints, confirm pods are in Ready state, and finally test DNS and port connectivity
+
+6
+
+Interview for resolving an real time issues in kubernetes 
+
+In GKE, we had pods failing with ImagePullBackOff when pulling from GCR. On checking pod events, it was an authentication issue. 
+I found that the node pool’s service account didn’t have roles/storage.objectViewer.
+I granted that role to the service account using gcloud projects add-iam-policy-binding. 
+After restarting the pods, the issue was resolved, and they could pull images from GCR successfully.
+Using node IAM permissions is the best practice in GKE instead of creating imagePullSecrets.
+
+To drain a node 
+When I drain a node in Kubernetes, the system first cordons the node so no new pods are scheduled there. 
+Then it starts evicting all pods, respecting PodDisruptionBudgets and pod termination grace periods. 
+Workloads controlled by Deployments or ReplicaSets are automatically recreated on other nodes.
+DaemonSet and static pods aren’t evicted, so we usually add --ignore-daemonsets.
+If pods get stuck in Terminating, I troubleshoot by checking for PDB violations, finalizers, or long grace periods. As a last resort, 
+I force delete the pods. After maintenance, I run kubectl uncordon to make the node schedulable again. This ensures a graceful and disruption-minimized node maintenance process
