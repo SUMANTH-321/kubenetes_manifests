@@ -1,0 +1,22 @@
+kubectl get pods -n <namespace>                # List pods
+kubectl get pods -o wide                       # Pods with node info & IP
+kubectl describe pod <pod-name> -n <namespace> # Debug pod details
+kubectl logs <pod-name>                        # View pod logs
+kubectl logs <pod-name> -c <container-name>    # Logs for specific container
+kubectl exec -it <pod-name> -- /bin/sh         # Get inside pod shell
+kubectl delete pod <pod-name>                  # Kill pod (deployment will restart it)
+kubectl rollout restart deployment <deploy>    # Restart deployment pods
+kubectl rollout status deployment <deploy>     # Check rollout progress
+kubectl rollout undo deployment <deploy>       # Rollback last deployment
+
+
+#Logs for a pod in a namespace
+kubectl logs -f <pod-name> -n <namespace>
+#Logs from a specific container (if pod has multiple containers)
+kubectl logs -f <pod-name> -c <container-name>
+#Logs from multiple pods (using label selector)
+kubectl logs -f -l app=my-app
+#Get last N lines before live streaming
+kubectl logs --tail=50 -f <pod-name>
+#Show logs from previous crashed container
+kubectl logs -p <pod-name>

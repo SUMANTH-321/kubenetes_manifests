@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules: 
+    - host: "myapp.com"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/bar"
+            backend:
+              service:
+                name: my-service-1
+                port:
+                  number: 80
+
+
+
+
+
+
+
+
+
